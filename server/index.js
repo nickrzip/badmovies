@@ -5,10 +5,9 @@ var app = express();
 var axios = require('axios');
 
 var config = require('./config.js');
-
 var bodyParser = require('body-parser');
-
 var apiHelpers = require('./apiHelpers.js');
+var dbHelpers = require('./database.js');
 
 app.use(bodyParser.json());
 
@@ -42,12 +41,24 @@ app.get('/genres', function(req, res) {
     });
 });
 
-app.post('/save', function(req, res) {
+app.get('/save', function(req, res) {
+    dbHelpers.getAllFavorites((err, results) => {
+        console.log('we are sending favourites');
+        console.log(results);
+        res.status(200).send(results);
+    }); 
+});
 
+app.post('/save', function(req, res) {
+    dbHelpers.saveFavorite(req.body.movieToSave[0], (err, results) => {
+        if (err) {
+            console.log(err);
+        }
+    });
 });
 
 app.post('/delete', function(req, res) {
-
+    dbHelpers.deleteFavorites(req.body.movieToDelete[0].id);
 });
 
 app.listen(3000, function() {
